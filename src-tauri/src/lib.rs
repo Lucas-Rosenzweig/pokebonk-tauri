@@ -159,6 +159,8 @@ pub fn eval_json(wv: &Webview, js: &str, timeout: Duration) -> Option<Value> {
 // ---- run ----
 
 pub fn run() {
+    #[cfg(target_os = "linux")]
+    linux_workarounds();
     let game = game_url();
     let app_id = std::env::var("POKEBONK_DISCORD_ID").unwrap_or_else(|_| discord::DEFAULT_APP_ID.into());
     let shared = Shared {
@@ -402,6 +404,14 @@ fn build_menu(app: &AppHandle) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
 }
 
 // ---- window and game webview ----
+
+/// WebKitGTK draws a blank window with NVIDIA's own driver while its DMA-BUF renderer is on.
+#[cfg(target_os = "linux")]
+fn linux_workarounds() {
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() && std::path::Path::new("/proc/driver/nvidia").exists() {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
+}
 
 fn platform() -> &'static str {
     if cfg!(target_os = "macos") {

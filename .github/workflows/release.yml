@@ -21,9 +21,18 @@ jobs:
           - platform: windows-latest
             args: --bundles nsis
             rust_targets: ''
+          - platform: ubuntu-22.04
+            args: --bundles deb,rpm,appimage
+            rust_targets: ''
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Linux dependencies
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf gstreamer1.0-plugins-base gstreamer1.0-plugins-good
 
       - uses: pnpm/action-setup@v4
         with:
@@ -68,5 +77,12 @@ jobs:
             **Windows 10/11** : télécharger `…_x64-setup.exe` et l'exécuter (installation pour l'utilisateur, sans droits administrateur).
             SmartScreen peut afficher « Windows a protégé votre ordinateur » : cliquer sur « Informations complémentaires » puis « Exécuter quand même ».
             La version Windows est encore peu testée, et Discord Rich Presence n'y est pas encore disponible.
+
+            **Linux (x86_64)** : trois formats, au choix.
+            - Debian, Ubuntu, Mint, Pop!_OS : télécharger le `.deb`, puis `sudo apt install ./PokeBonk.Tauri_<version>_amd64.deb` (adapter le nom du fichier).
+            - Fedora, openSUSE : télécharger le `.rpm`, puis `sudo dnf install ./PokeBonk.Tauri-<version>-1.x86_64.rpm`.
+            - Autres distributions, Steam Deck en mode Bureau : télécharger le `.AppImage`, le rendre exécutable (`chmod +x PokeBonk.Tauri_*.AppImage`) puis le lancer.
+
+            Le `.deb` et le `.rpm` utilisent le WebKitGTK du système, installé automatiquement comme dépendance. La version Linux est encore peu testée.
 
             Projet non officiel, voir le [README](https://github.com/Lucas-Rosenzweig/pokebonk-tauri#readme).

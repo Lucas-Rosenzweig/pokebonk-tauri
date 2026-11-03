@@ -6,7 +6,7 @@
 > Le jeu : https://pokebonk.com · le créateur sur GitHub : https://github.com/CharcherGit · le client officiel : https://github.com/CharcherGit/pokebonk-app
 > Si le créateur le demande, ce dépôt sera retiré.
 
-Client de bureau non officiel pour [PokéBonk](https://pokebonk.com), écrit en Tauri 2 au lieu d'Electron. Il charge https://pokebonk.com dans le moteur web du système (WebKit sur macOS, WebView2 sur Windows) : le compte et la progression sont côté serveur, donc identiques à ceux du site.
+Client de bureau non officiel pour [PokéBonk](https://pokebonk.com), écrit en Tauri 2 au lieu d'Electron. Il charge https://pokebonk.com dans le moteur web du système (WebKit sur macOS, WebView2 sur Windows, WebKitGTK sur Linux) : le compte et la progression sont côté serveur, donc identiques à ceux du site.
 
 Les images de `web/splash/`, `web/icon.png` et les textes de `src-tauri/src/texts.json` viennent du client officiel (© leur auteur).
 
@@ -21,6 +21,14 @@ xattr -dr com.apple.quarantine "/Applications/PokéBonk Tauri.app"
 ```
 
 **Windows 10/11** : télécharger `…_x64-setup.exe` et l'exécuter (installation pour l'utilisateur, sans droits administrateur). SmartScreen peut afficher « Windows a protégé votre ordinateur » : « Informations complémentaires » puis « Exécuter quand même ». La version Windows est encore peu testée.
+
+**Linux (x86_64)** : trois formats, au choix.
+
+- Debian, Ubuntu, Mint, Pop!_OS : télécharger le `.deb`, puis `sudo apt install ./PokeBonk.Tauri_<version>_amd64.deb` (adapter le nom du fichier).
+- Fedora, openSUSE : télécharger le `.rpm`, puis `sudo dnf install ./PokeBonk.Tauri-<version>-1.x86_64.rpm`.
+- Autres distributions, Steam Deck en mode Bureau : télécharger le `.AppImage`, le rendre exécutable (`chmod +x PokeBonk.Tauri_*.AppImage`) puis le lancer.
+
+Le `.deb` et le `.rpm` utilisent le WebKitGTK du système, installé automatiquement comme dépendance.
 
 ## Pourquoi
 
@@ -48,13 +56,15 @@ Le client Electron 1.4.0 pour Mac plantait au lancement (les noms des Helpers co
 - Pas de choix de backend graphique ni de V-Sync (WebKit s'en charge).
 - Pas de mise à jour automatique : le jeu propose le téléchargement, comme le client Electron sur Mac.
 - Windows : l'installateur est construit par la CI mais l'app y est très peu testée. Discord n'y est pas encore disponible.
+- Linux : les paquets sont construits et lancés automatiquement par la CI (écran virtuel), mais l'app n'a pas encore été testée sur une vraie machine Linux.
 - Pas de relance automatique si le processus de la page plante.
 
 ## Prérequis
 
 - Rust (stable, version 1.82 ou plus)
 - Node et pnpm
-- Xcode Command Line Tools
+- Xcode Command Line Tools (macOS)
+- Linux : les paquets de développement WebKitGTK 4.1, voir https://v2.tauri.app/start/prerequisites/#linux
 
 ## Commandes
 
@@ -102,6 +112,8 @@ pnpm icons
 web/                      pages locales : splash.html, offline.html, images, polices
 src-tauri/
   tauri.conf.json         configuration de l'app (identifiant, bundle .app)
+  tauri.linux.conf.json   réglages propres à Linux : nom sans accent pour les paquets, son dans l'AppImage
+  linux/pokebonk-tauri.desktop  entrée de menu Linux
   build.rs                déclare les commandes du pont (permissions)
   capabilities/game.json  ce que la page a le droit d'appeler
   src/
@@ -115,6 +127,8 @@ src-tauri/
     bridge.js             script injecté qui expose window.pokebonkDesktop
 ```
 
+Les workflows sont dans `.github/workflows/` : `ci.yml` (clippy), `release.yml` (publication) et `linux-smoke.yml`, qui construit les paquets Linux et les lance sur un écran virtuel avec `.github/linux-smoke.sh`.
+
 ## Publier une version
 
 Pour le mainteneur : changer `version` dans `src-tauri/tauri.conf.json` (et dans `package.json` et `src-tauri/Cargo.toml`, pour les garder alignés), commiter, puis créer et pousser le tag :
@@ -127,7 +141,7 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-Le workflow Release construit le `.dmg` (universel) et l'installateur Windows, puis publie la release.
+Le workflow Release construit le `.dmg` (universel), l'installateur Windows et les paquets Linux (`.deb`, `.rpm`, `.AppImage`), puis publie la release.
 
 ## Sécurité
 

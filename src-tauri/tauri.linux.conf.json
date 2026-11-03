@@ -1,0 +1,11 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "PokeBonk Tauri",
+  "bundle": {
+    "linux": {
+      "appimage": { "bundleMediaFramework": true },
+      "deb": { "section": "games", "desktopTemplate": "linux/pokebonk-tauri.desktop" },
+      "rpm": { "desktopTemplate": "linux/pokebonk-tauri.desktop" }
+    }
+  }
+}
