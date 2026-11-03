@@ -1,8 +1,26 @@
 # PokéBonk Tauri
 
-Client de bureau non officiel pour [PokéBonk](https://pokebonk.com), écrit en Tauri 2 au lieu d'Electron. Il charge https://pokebonk.com dans le moteur web du système (WebKit sur macOS) : le compte et la progression sont côté serveur, donc identiques à ceux du site.
+> [!WARNING]
+> **Projet non officiel, fait pour le fun, sans aucun lien avec le créateur de PokéBonk.**
+> Le jeu, les images (écran de chargement, icône, Poké Ball), les astuces et les textes viennent du projet original PokéBonk de Charcher.
+> Le jeu : https://pokebonk.com · le créateur sur GitHub : https://github.com/CharcherGit · le client officiel : https://github.com/CharcherGit/pokebonk-app
+> Si le créateur le demande, ce dépôt sera retiré.
 
-Ce projet n'est pas affilié au développeur de PokéBonk. Les images de `web/splash/`, `web/icon.png` et les textes de `src-tauri/src/texts.json` viennent du client officiel (© leur auteur) : le dépôt doit rester privé.
+Client de bureau non officiel pour [PokéBonk](https://pokebonk.com), écrit en Tauri 2 au lieu d'Electron. Il charge https://pokebonk.com dans le moteur web du système (WebKit sur macOS, WebView2 sur Windows) : le compte et la progression sont côté serveur, donc identiques à ceux du site.
+
+Les images de `web/splash/`, `web/icon.png` et les textes de `src-tauri/src/texts.json` viennent du client officiel (© leur auteur).
+
+## Télécharger
+
+Les versions sont sur la page [Releases](https://github.com/Lucas-Rosenzweig/pokebonk-tauri/releases/latest).
+
+**macOS (Apple Silicon et Intel)** : télécharger le `.dmg`, l'ouvrir, glisser l'app dans Applications. L'app n'est pas signée par un compte développeur Apple : au premier lancement macOS la bloque. Aller dans Réglages Système → Confidentialité et sécurité → « Ouvrir quand même », ou lancer dans le Terminal :
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/PokéBonk Tauri.app"
+```
+
+**Windows 10/11** : télécharger `…_x64-setup.exe` et l'exécuter (installation pour l'utilisateur, sans droits administrateur). SmartScreen peut afficher « Windows a protégé votre ordinateur » : « Informations complémentaires » puis « Exécuter quand même ». La version Windows est encore peu testée.
 
 ## Pourquoi
 
@@ -29,7 +47,7 @@ Le client Electron 1.4.0 pour Mac plantait au lancement (les noms des Helpers co
 - Moteur WebKit au lieu de Chromium : les données locales du navigateur (localStorage) du client Electron ne sont pas reprises.
 - Pas de choix de backend graphique ni de V-Sync (WebKit s'en charge).
 - Pas de mise à jour automatique : le jeu propose le téléchargement, comme le client Electron sur Mac.
-- Discord n'est pas encore disponible sur Windows.
+- Windows : l'installateur est construit par la CI mais l'app y est très peu testée. Discord n'y est pas encore disponible.
 - Pas de relance automatique si le processus de la page plante.
 
 ## Prérequis
@@ -95,6 +113,20 @@ src-tauri/
     texts.rs, texts.json  textes traduits du client officiel
     bridge.js             script injecté qui expose window.pokebonkDesktop
 ```
+
+## Publier une version
+
+Pour le mainteneur : changer `version` dans `src-tauri/tauri.conf.json` (et dans `package.json` et `src-tauri/Cargo.toml`, pour les garder alignés), commiter, puis créer et pousser le tag :
+
+```bash
+git tag vX.Y.Z
+```
+
+```bash
+git push origin vX.Y.Z
+```
+
+Le workflow Release construit le `.dmg` (universel) et l'installateur Windows, puis publie la release.
 
 ## Sécurité
 

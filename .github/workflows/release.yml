@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target universal-apple-darwin --bundles app,dmg
+            rust_targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - platform: windows-latest
+            args: --bundles nsis
+            rust_targets: ''
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tauriScript: pnpm tauri
+          args: ${{ matrix.args }}
+          tagName: v__VERSION__
+          releaseName: 'PokéBonk Tauri v__VERSION__'
+          releaseDraft: false
+          prerelease: false
+          releaseBody: |
+            ## Installation
+
+            **macOS (Apple Silicon et Intel)** : télécharger le `.dmg`, l'ouvrir, puis glisser l'app dans Applications.
+            L'app n'est pas signée par un compte développeur Apple : au premier lancement, macOS la bloque.
+            Aller dans Réglages Système → Confidentialité et sécurité → « Ouvrir quand même », ou lancer dans le Terminal :
+
+            ```bash
+            xattr -dr com.apple.quarantine "/Applications/PokéBonk Tauri.app"
+            ```
+
+            **Windows 10/11** : télécharger `…_x64-setup.exe` et l'exécuter (installation pour l'utilisateur, sans droits administrateur).
+            SmartScreen peut afficher « Windows a protégé votre ordinateur » : cliquer sur « Informations complémentaires » puis « Exécuter quand même ».
+            La version Windows est encore peu testée, et Discord Rich Presence n'y est pas encore disponible.
+
+            Projet non officiel, voir le [README](https://github.com/Lucas-Rosenzweig/pokebonk-tauri#readme).

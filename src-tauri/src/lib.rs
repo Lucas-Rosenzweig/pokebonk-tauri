@@ -2,6 +2,8 @@
 //! (`window.pokebonkDesktop`) as the Electron client it replaces.
 
 mod config;
+// Windows has no Discord IPC yet (named pipe not done): most of the module is unused there.
+#[cfg_attr(not(unix), allow(dead_code))]
 mod discord;
 mod display;
 mod splash;

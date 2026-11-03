@@ -41,6 +41,7 @@ pub fn tips(lang: &str) -> Vec<String> {
 }
 
 /// Menu labels (macOS), which the Electron client left to Electron's own roles.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub fn menu(lang: &str, key: &str) -> &'static str {
     let fr = lang == "fr";
     let es = lang == "es";
