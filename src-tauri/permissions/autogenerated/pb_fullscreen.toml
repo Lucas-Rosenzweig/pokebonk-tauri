@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-pb-fullscreen"
+description = "Enables the pb_fullscreen command without any pre-configured scope."
+commands.allow = ["pb_fullscreen"]
+
+[[permission]]
+identifier = "deny-pb-fullscreen"
+description = "Denies the pb_fullscreen command without any pre-configured scope."
+commands.deny = ["pb_fullscreen"]

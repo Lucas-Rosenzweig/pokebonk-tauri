@@ -1,0 +1,15 @@
+{
+  "name": "pokebonk-tauri",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Client de bureau PokéBonk en Tauri (non officiel)",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build --bundles app",
+    "icons": "tauri icon web/icon.png"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-pb-relaunch"
+description = "Enables the pb_relaunch command without any pre-configured scope."
+commands.allow = ["pb_relaunch"]
+
+[[permission]]
+identifier = "deny-pb-relaunch"
+description = "Denies the pb_relaunch command without any pre-configured scope."
+commands.deny = ["pb_relaunch"]

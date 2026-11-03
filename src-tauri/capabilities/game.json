@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "game",
+  "description": "The bridge (window.pokebonkDesktop) for the game on pokebonk.com and for the local offline page. Nothing else: no files, no shell.",
+  "webviews": ["game"],
+  "local": true,
+  "remote": {
+    "urls": ["https://pokebonk.com/*", "https://*.pokebonk.com/*"]
+  },
+  "permissions": [
+    "allow-pb-display",
+    "allow-pb-set-display",
+    "allow-pb-fullscreen",
+    "allow-pb-relaunch",
+    "allow-pb-quit",
+    "allow-pb-retry",
+    "allow-pb-presence",
+    "allow-pb-key",
+    "allow-pb-open"
+  ]
+}
