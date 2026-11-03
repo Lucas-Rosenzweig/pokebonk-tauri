@@ -19,6 +19,8 @@
     "targets": ["app"],
     "category": "public.app-category.games",
     "shortDescription": "Client de bureau PokéBonk (non officiel)",
+    "longDescription": "Client de bureau non officiel pour le jeu PokéBonk (pokebonk.com), écrit en Tauri.",
+    "publisher": "Lucas Rosenzweig",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

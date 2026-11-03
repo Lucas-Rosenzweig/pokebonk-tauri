@@ -2,8 +2,6 @@ name: Linux smoke test
 
 on:
   workflow_dispatch:
-  push:
-    branches: [linux]
 
 jobs:
   smoke:
