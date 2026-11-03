@@ -109,6 +109,7 @@ src-tauri/
     splash.rs             écran de chargement
     display.rs            réglages d'affichage (pont display/setDisplay)
     discord.rs            Discord Rich Presence
+    pointer_lock.rs       capture de la souris sur macOS : autorise le verrouillage du pointeur, que WKWebView refuse par défaut
     config.rs             client.json et window.json
     texts.rs, texts.json  textes traduits du client officiel
     bridge.js             script injecté qui expose window.pokebonkDesktop

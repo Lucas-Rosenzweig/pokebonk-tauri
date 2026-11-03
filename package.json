@@ -1,7 +1,7 @@
 {
   "name": "pokebonk-tauri",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Client de bureau PokéBonk en Tauri (non officiel)",
   "scripts": {
     "tauri": "tauri",

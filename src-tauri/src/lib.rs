@@ -6,6 +6,8 @@ mod config;
 #[cfg_attr(not(unix), allow(dead_code))]
 mod discord;
 mod display;
+#[cfg(target_os = "macos")]
+mod pointer_lock;
 mod splash;
 mod texts;
 
@@ -527,7 +529,9 @@ fn create_main(app: &AppHandle) -> tauri::Result<()> {
     };
     let window = wb.build()?;
     let size = window.inner_size()?.to_logical::<f64>(window.scale_factor()?);
-    window.add_child(game_builder(app), LogicalPosition::new(0.0, 0.0), size)?;
+    let _game = window.add_child(game_builder(app), LogicalPosition::new(0.0, 0.0), size)?;
+    #[cfg(target_os = "macos")]
+    pointer_lock::enable(&_game);
 
     let sh = app.state::<Shared>();
     sh.st.lock().unwrap().restore = Some(state);
@@ -880,6 +884,23 @@ fn perform(app: &AppHandle, what: Leave) {
 
 // ---- self-test ----
 
+/// Installs the pointer lock log (`window.__pbLock`) and tries a lock without a user gesture.
+const LOCK_PROBE_JS: &str = r#"(() => {
+  const log = window.__pbLock = { events: [] };
+  const add = (s) => log.events.push(s + '@' + Math.round(performance.now()));
+  const ask = () => {
+    try {
+      const p = document.body.requestPointerLock();
+      if (p && p.catch) p.catch((e) => add('reject:' + (e && e.name)));
+    } catch (e) { add('throw:' + (e && e.name)); }
+  };
+  document.addEventListener('pointerlockchange', () => add('change:' + (document.pointerLockElement ? document.pointerLockElement.tagName : 'none')));
+  document.addEventListener('pointerlockerror', () => add('error'));
+  window.addEventListener('pointerdown', () => { if (!document.pointerLockElement) ask(); }, true);
+  add('try');
+  ask();
+})()"#;
+
 const REPORT_JS: &str = r#"(() => {
   let webgl = null;
   try {
@@ -895,6 +916,8 @@ const REPORT_JS: &str = r#"(() => {
     askLeave: !!(window.__pb && window.__pb.askLeave()),
     ipc: window.__pbTest,
     screen: innerWidth + 'x' + innerHeight + '@' + devicePixelRatio,
+    pointerLock: window.__pbLock || null,
+    locked: !!document.pointerLockElement,
     webgl,
   });
 })()"#;
@@ -911,6 +934,9 @@ fn start_selftest(app: &AppHandle) {
         while t0.elapsed() < wait {
             if splash_gone_ms.is_none() && sh.st.lock().unwrap().splash.is_none() {
                 splash_gone_ms = Some(t0.elapsed().as_millis());
+                if let Some(wv) = game_webview(&app) {
+                    let _ = wv.eval(LOCK_PROBE_JS);
+                }
             }
             if !probed && t0.elapsed() + Duration::from_millis(1500) >= wait {
                 probed = true;
