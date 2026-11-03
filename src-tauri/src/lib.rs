@@ -198,13 +198,7 @@ pub fn run() {
             "pb-quit" => start_leave(app, Leave::Close),
             "pb-reload" => start_leave(app, Leave::Reload),
             "pb-fullscreen" => toggle_fullscreen(app),
-            "pb-devtools" => {
-                if app.state::<Shared>().devtools {
-                    if let Some(wv) = game_webview(app) {
-                        wv.open_devtools();
-                    }
-                }
-            }
+            "pb-devtools" => open_devtools(app),
             _ => {}
         })
         .setup(|app| {
@@ -615,6 +609,16 @@ pub fn set_fullscreen(app: &AppHandle, w: &Window, on: bool) {
     let _ = w.set_fullscreen(on);
 }
 
+/// Opens the game's developer tools, only when they are on (debug build or `--devtools`).
+fn open_devtools(app: &AppHandle) {
+    if !app.state::<Shared>().devtools {
+        return;
+    }
+    if let Some(wv) = game_webview(app) {
+        wv.open_devtools();
+    }
+}
+
 fn toggle_fullscreen(app: &AppHandle) {
     if let Some(w) = main_window(app) {
         let on = w.is_fullscreen().unwrap_or(false);
@@ -1007,13 +1011,7 @@ fn pb_key(app: AppHandle, action: String) {
     match action.as_str() {
         "fullscreen" => toggle_fullscreen(&app),
         "reload" => start_leave(&app, Leave::Reload),
-        "devtools" => {
-            if app.state::<Shared>().devtools {
-                if let Some(wv) = game_webview(&app) {
-                    wv.open_devtools();
-                }
-            }
-        }
+        "devtools" => open_devtools(&app),
         _ => {}
     }
 }
